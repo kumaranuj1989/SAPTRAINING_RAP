@@ -1,0 +1,11 @@
+projection;
+strict ( 2 );
+
+define behavior for YDEMO_C_TRAVEL alias TravelP
+use etag
+{
+    use create;
+    use update;
+    use delete;
+  use action cancel_travel;
+  }

@@ -1,0 +1,4 @@
+@EndUserText.label: 'Flight Travel Service Definition'
+define service YDEMO_SD_TRAVEL {
+  expose YDEMO_C_TRAVEL as Travel;
+}
