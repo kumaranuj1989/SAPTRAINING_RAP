@@ -10,7 +10,12 @@
 annotate entity YDEMO_C_TRAVEL with
 {
   @UI:{ facet: [{ purpose: #STANDARD,id: 'Travel',position: 10, label: 'Travel',type: #IDENTIFICATION_REFERENCE }],
-        identification: [{ label: 'Agency ID',position: 10, importance: #LOW }]
+  
+        identification: [{ label: 'Agency ID',position: 10, importance: #LOW },
+                         { label: 'Cancel the Travel',position: 10, type: #FOR_ACTION, dataAction: 'Cancel' },
+                         { label: 'Issue Message',position: 20, type: #FOR_ACTION, dataAction: 'IssueMessage' }],
+        lineItem: [{ position: 10, label: 'Cancel the Travel', type: #FOR_ACTION, dataAction: 'Cancel' },
+                   { position: 20, label: 'Issue Message', type: #FOR_ACTION, dataAction: 'IssueMessage' } ]
        }
   AgencyId;
   @UI: { identification: [ { position: 20, importance: #HIGH } ],

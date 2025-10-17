@@ -9,10 +9,12 @@ CLASS ycl_demo_model DEFINITION
         i_user          TYPE syuname DEFAULT sy-uname
       RETURNING
         VALUE(r_result) TYPE /dmo/agency_id .
+
     "! <p class="shorttext synchronized" lang="en">This method simulates a number range object</p>
     CLASS-METHODS get_next_travelid
       RETURNING
         VALUE(r_result) TYPE /dmo/travel_id .
+
     "! <p class="shorttext synchronized" lang="en">This method simulates an authority check</p>
     CLASS-METHODS authority_check
       IMPORTING

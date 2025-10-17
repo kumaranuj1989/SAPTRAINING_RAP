@@ -4,14 +4,24 @@ strict ( 2 );
 define behavior for ydemo_R_TRAVEL alias Travel
 persistent table ydemo_travel
 lock master
+//Both global & Instance authorization can be made, it will create two methods
+//
 authorization master ( instance )
 etag master ChangedAt
 {
   create ( authorization : global );
   update;
   delete;
-  //field ( readonly ) AgencyId, TravelId;
-  action cancel_travel;
+  field ( readonly : update ) AgencyId, TravelId;
+
+  //Independent from Entity instance
+  static action (authorization : global ) issue_message;
+
+  //Operates on Specific entity instance
+  //Result parameter up to one data set
+  //$self means the result parameter will have same result as entity
+  //use keyword "parameter" to pass input to the action, the parameter will have the CDS abstract entity
+  action cancel_travel result[1] $self;
 
   mapping for ydemo_travel corresponding
     {

@@ -1,0 +1,11 @@
+@EndUserText.label: 'Access control for Projection'
+@MappingRole: true
+define role YDEMO_C_TRAVEL_AC {
+    grant
+        select
+            on
+                YDEMO_C_TRAVEL
+                    where
+                        inheriting conditions from entity ydemo_R_TRAVEL;
+                        
+}

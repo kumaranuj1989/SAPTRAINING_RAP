@@ -1,0 +1,11 @@
+@EndUserText.label: 'Access control for data model'
+@MappingRole: true
+define role YDEMO_R_TRAVEL_AC {
+//    grant 
+//        select
+//            on
+//                YDEMO_R_TRAVEL
+//                    where
+//                        (AgencyId) = aspect pfcg_auth( YDEMO_AGCY, YDMO_AGCYF, ACTVT = '03');
+                        
+}

@@ -1,3 +1,6 @@
+**********************************************************************
+* This class is for calling the RAP BP implementation methods outside RAP Framework
+*
 CLASS ycl_demo_eml DEFINITION
   PUBLIC
   FINAL

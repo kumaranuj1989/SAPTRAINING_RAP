@@ -6,8 +6,12 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
       IMPORTING REQUEST requested_authorizations FOR Travel RESULT result.
+
     METHODS cancel_travel FOR MODIFY
-      IMPORTING keys FOR ACTION Travel~cancel_travel.
+      IMPORTING keys FOR ACTION Travel~cancel_travel RESULT result.
+
+    METHODS issue_message FOR MODIFY
+      IMPORTING keys FOR ACTION Travel~issue_message.
 
 ENDCLASS.
 
@@ -15,29 +19,28 @@ CLASS lhc_Travel IMPLEMENTATION.
 
   METHOD get_instance_authorizations.
     result = CORRESPONDING #( keys ).
-
-    LOOP AT result ASSIGNING FIELD-SYMBOL(<result>).
-
-      DATA(rc) =  ycl_demo_model=>authority_check(
-                              i_agencyid  = <result>-agencyid
-                              i_actvt     = '03' ).
-
-      IF rc <> 0.
-        <result>-%action-cancel_travel = if_abap_behv=>auth-unauthorized.
-        <result>-%update               = if_abap_behv=>auth-unauthorized.
-      ELSE.
-        <result>-%action-cancel_travel = if_abap_behv=>auth-allowed.
-        <result>-%update               = if_abap_behv=>auth-allowed.
-      ENDIF.
-
-    ENDLOOP.
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    " Below code can be used to authorize for accessing Cancel Travel button
+*    LOOP AT result ASSIGNING FIELD-SYMBOL(<result>).
+*
+*      DATA(rc) =  ycl_demo_model=>authority_check(
+*                              i_agencyid  = <result>-agencyid
+*                              i_actvt     = '02' ).
+*
+*      IF rc <> 0.
+*        <result>-%action-cancel_travel = if_abap_behv=>auth-unauthorized.
+*      ELSE.
+*        <result>-%action-cancel_travel = if_abap_behv=>auth-allowed.
+*      ENDIF.
+*
+*    ENDLOOP.
   ENDMETHOD.
 
   METHOD get_global_authorizations.
   ENDMETHOD.
 
   METHOD cancel_travel.
-
+    "   Read the selected entity based on the keys
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
     ENTITY Travel
     ALL FIELDS WITH CORRESPONDING #( keys )
@@ -49,20 +52,34 @@ CLASS lhc_Travel IMPLEMENTATION.
       LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
 
         IF <lfs_result>-Status <> 'C'.
+          " Modify the entity with Status C where by passing the key
           MODIFY ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
           ENTITY Travel
           UPDATE FIELDS ( Status ) WITH VALUE #( (  %tky = <lfs_result>-%tky
                                                    Status = 'C' ) ).
 
+          INSERT VALUE #( %msg     = new ycl_demo_msg( textid = ycl_demo_msg=>cancel_success
+                          severity = if_abap_behv_message=>severity-success  ) )
+                 INTO TABLE reported-travel.
+
+          "Insert key field and the whole structure of that particular records
+          INSERT VALUE #( %tky = <lfs_result>-%tky %param = <lfs_result> ) INTO TABLE result.
+
         ELSE.
           APPEND VALUE #( %tky = <lfs_result>-%tky ) TO failed-travel.
           APPEND VALUE #( %tky = <lfs_result>-%tky
                           %element-TravelId = if_abap_behv=>mk-on
-                          %msg = new_message_with_text( text = 'Already Cancelled' ) ) TO reported-travel.
+                          %msg = new ycl_demo_msg( textid = ycl_demo_msg=>already_canceled ) ) TO reported-travel.
 
         ENDIF.
       ENDLOOP.
     ENDIF.
+  ENDMETHOD.
+
+  METHOD issue_message.
+   INSERT VALUE #( %msg     = new ycl_demo_msg( textid = ycl_demo_msg=>issue_message
+                          severity = if_abap_behv_message=>severity-success  ) )
+                 INTO TABLE reported-travel.
   ENDMETHOD.
 
 ENDCLASS.
