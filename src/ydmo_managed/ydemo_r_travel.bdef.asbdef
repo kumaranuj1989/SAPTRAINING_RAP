@@ -9,19 +9,39 @@ lock master
 authorization master ( instance )
 etag master ChangedAt
 {
+  // ( Features: instance or features: global ) can be added to each of the below Actions
+  // Precheck : A method is called before the update request to prevent unwanted changes from reaching the application buffer.
+  //Internal : Prefix which disables the operation for external consumers of the BO.
   create ( authorization : global );
   update;
   delete;
-  field ( readonly : update ) AgencyId, TravelId;
-
+  //Static Field Control
+  //Field(suppress) can be used to remove a field from the derived types, field mapping, and all RAP APIs.
+  //It is possible for all fields except for key fields, foreign key fields, and fields used by the current behavior definition, such as ETag fields.
+  field ( readonly : update, mandatory : create ) AgencyId, TravelId;
+  field ( readonly ) ChangedAt, ChangedBy, Status;
+  field ( mandatory ) Description, CustomerId, BeginDate, EndDate;
   //Independent from Entity instance
   static action (authorization : global ) issue_message;
-
   //Operates on Specific entity instance
   //Result parameter up to one data set
   //$self means the result parameter will have same result as entity
   //use keyword "parameter" to pass input to the action, the parameter will have the CDS abstract entity
   action cancel_travel result[1] $self;
+
+
+  validation validateDescription on save { create; update; field Description; }
+
+  validation validateCustomer on save { create; field CustomerId; }
+
+  validation validateBeginDate on save { create; field BeginDate; }
+
+  validation validateEndDate on save { create; field EndDate; }
+
+  validation validateDateSequence on save { create; field BeginDate, EndDate; }
+
+  determination determineStatus on modify { create; }
+
 
   mapping for ydemo_travel corresponding
     {
