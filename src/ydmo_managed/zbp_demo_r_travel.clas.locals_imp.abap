@@ -30,6 +30,10 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS validateEndDate FOR VALIDATE ON SAVE
       IMPORTING keys FOR Travel~validateEndDate.
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR Travel RESULT result.
+    METHODS earlynumbering_create FOR NUMBERING
+      IMPORTING entities FOR CREATE Travel.
 
 ENDCLASS.
 
@@ -101,22 +105,22 @@ CLASS lhc_Travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD determineStatus.
-  READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
-    ENTITY Travel
-    FIELDS ( Status )
-    WITH CORRESPONDING #( keys )
-    RESULT DATA(lt_result).
+    READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
+      ENTITY Travel
+      FIELDS ( Status )
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(lt_result).
 
-    delete lt_result where Status is not INITIAL.
-    check lt_result is not INITIAL.
+    DELETE lt_result WHERE Status IS NOT INITIAL.
+    CHECK lt_result IS NOT INITIAL.
 
     MODIFY ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
     ENTITY Travel
     UPDATE FIELDS ( Status )
-    WITH value #( for ls_Result in lt_Result ( %tky = ls_Result-%tky
+    WITH VALUE #( FOR ls_Result IN lt_Result ( %tky = ls_Result-%tky
                                                Status = 'N' ) )
-    REPORTED data(lt_reported)
-    MAPPED   data(lt_mapped).
+    REPORTED DATA(lt_reported)
+    MAPPED   DATA(lt_mapped).
 
     reported = CORRESPONDING #( DEEP lt_reported ).
   ENDMETHOD.
@@ -233,4 +237,55 @@ CLASS lhc_Travel IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
+  METHOD earlynumbering_create.
+    DATA(agencyid) = ycl_demo_model=>get_agency_by_user(  ).
+
+    mapped-travel = CORRESPONDING #( entities ).
+
+    LOOP AT mapped-travel ASSIGNING FIELD-SYMBOL(<mapping>).
+      <mapping>-agencyid = agencyid.
+      <mapping>-travelid = ycl_demo_model=>get_next_travelid( ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD get_instance_features.
+    READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
+       ENTITY Travel
+       FIELDS ( Status BeginDate EndDate )
+       WITH CORRESPONDING #( keys )
+       RESULT DATA(lt_travel).
+
+    LOOP AT lt_travel ASSIGNING FIELD-SYMBOL(<lfs_travel>).
+    "In instance-based feature control, it is important that you add a row to result for each row of keys. If you fail to do so, it leads to a runtime error.
+      APPEND CORRESPONDING #( <lfs_travel> ) TO result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+
+      IF <lfs_travel>-Status = 'C' OR
+         ( <lfs_travel>-EndDate IS NOT INITIAL AND <lfs_travel>-EndDate <  cl_abap_context_info=>get_system_date( ) ).
+
+        <lfs_result>-%update = if_abap_behv=>fc-o-disabled.
+        <lfs_result>-%action-cancel_travel = if_abap_behv=>fc-o-disabled.
+
+      ELSE.
+        <lfs_result>-%update = if_abap_behv=>fc-o-enabled.
+        <lfs_result>-%action-cancel_travel = if_abap_behv=>fc-o-enabled.
+      ENDIF.
+
+      IF <lfs_travel>-begindate IS NOT INITIAL AND
+         <lfs_travel>-begindate < cl_abap_context_info=>get_system_date( ).
+
+        <lfs_result>-%field-customerid = if_abap_behv=>fc-f-read_only.
+        <lfs_result>-%field-begindate  = if_abap_behv=>fc-f-read_only.
+
+      ELSE.
+
+        <lfs_result>-%field-customerid = if_abap_behv=>fc-f-mandatory.
+        <lfs_result>-%field-begindate  = if_abap_behv=>fc-f-mandatory.
+
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
 ENDCLASS.
