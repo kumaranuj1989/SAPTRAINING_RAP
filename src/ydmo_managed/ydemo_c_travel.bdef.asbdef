@@ -1,6 +1,7 @@
 projection;
 strict ( 2 );
 use draft;
+//TO enable calling of Side effect method
 use side effects;
 define behavior for YDEMO_C_TRAVEL alias TravelP
 use etag
