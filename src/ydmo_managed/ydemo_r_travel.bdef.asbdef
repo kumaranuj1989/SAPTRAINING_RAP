@@ -92,7 +92,7 @@ early numbering
 
   //This will call determine action checkcustomer and eventually it will call validate validate customer validation whenever customer ID is changed
   //This will be applicable for ODATA V4 only
-  side effects { determine action checkCustomer executed on field CustomerId affects messages;
+  side effects { //determine action checkCustomer executed on field CustomerId affects messages;
   //This will call determine action adjustDuration and eventually it will call 3 validation defined whenever both field begin date and end date is changed
   //This will be applicable for ODATA V4 only. Note as 2 fields are mentioned, the methods will be called when both field are changed
                  determine action adjustDuration executed on field BeginDate, field EndDate affects field Duration, messages; }

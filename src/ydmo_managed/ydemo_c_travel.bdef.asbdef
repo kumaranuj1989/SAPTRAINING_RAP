@@ -22,4 +22,6 @@ use etag
 
   use action adjustDuration;
   use action checkCustomer;
+  //You can also use side effects here
+  side effects { determine action checkCustomer executed on field CustomerId affects messages; }
 }
