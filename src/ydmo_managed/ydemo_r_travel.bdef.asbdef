@@ -1,13 +1,20 @@
 managed implementation in class zbp_demo_r_travel unique;
 strict ( 2 );
 
+with draft;
+
 define behavior for ydemo_R_TRAVEL alias Travel
 persistent table ydemo_travel
-lock master
+draft table ydemo_d_travel
+//In draft-enabled RAP BOs, it is mandatory to define a total ETag field.
+lock master total etag ChangedAt
 //Both global & Instance authorization can be made, it will create two methods
 //
 authorization master ( instance )
-etag master ChangedAt
+//You can consider the field that is annotated with @Semantics.systemDateTime.localInstanceLastChangedAt: true
+//as a time stamp for the last change to the draft instance (“local Instance”). While the field annotated with @Semantics.systemdateTime.lastchangedAt: true
+//contains the time stamp for the last change to the active instance.
+etag master LocChangedAt  //ChangedAt
 
 early numbering
 {
@@ -24,7 +31,7 @@ early numbering
   //It is possible for all fields except for key fields, foreign key fields, and fields used by the current behavior definition, such as ETag fields.
   // field ( readonly : update, mandatory : create ) AgencyId, TravelId;     commented for early numbering
   field ( readonly ) AgencyId, TravelId;
-  field ( readonly ) ChangedAt, ChangedBy, Status;
+  field ( readonly ) ChangedAt, ChangedBy, Status, LocChangedAt, Duration;
 
   //field ( mandatory ) Description, CustomerId, BeginDate, EndDate;
   field ( mandatory ) Description, EndDate;
@@ -49,20 +56,53 @@ early numbering
 
   validation validateDateSequence on save { create; field BeginDate, EndDate; }
   // On modify(The determination is executed immediately after data changes take place) and
-  //On Save(The determination is executed during the save sequence at the end of an transaction), it doesnt have failed parameter
   determination determineStatus on modify { create; }
+  //On Save(The determination is executed during the save sequence at the end of an transaction), it doesnt have failed parameter
+  determination determineDuration on save { field BeginDate, EndDate; }
 
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare
+  {
+    //Only determinations defined with on save can be assigned.
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+  }
+
+  determine action adjustDuration
+  {
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+
+    determination ( always ) determineDuration;
+  }
+
+  determine action checkCustomer
+  {
+   validation validateCustomer;
+  }
+
+  side effects { determine action checkCustomer executed on field CustomerId affects messages;
+                 determine action adjustDuration executed on field BeginDate, field EndDate affects field Duration, messages; }
 
   mapping for ydemo_travel corresponding
     {
-      AgencyID    = agency_ID;
-      TravelID    = travel_id;
-      Description = description;
-      CustomerID  = customer_id;
-      BeginDate   = begin_date;
-      EndDate     = end_date;
-      Status      = status;
-      ChangedAt   = changed_at;
-      ChangedBy   = changed_by;
+      AgencyID     = agency_ID;
+      TravelID     = travel_id;
+      Description  = description;
+      CustomerID   = customer_id;
+      BeginDate    = begin_date;
+      EndDate      = end_date;
+      Status       = status;
+      ChangedAt    = changed_at;
+      ChangedBy    = changed_by;
+      LocChangedAt = loc_changed_at;
     }
 }

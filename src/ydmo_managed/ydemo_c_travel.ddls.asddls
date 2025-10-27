@@ -12,7 +12,9 @@ define root view entity YDEMO_C_TRAVEL
       CustomerId,
       BeginDate,
       EndDate,
+      Duration,
       Status,
       ChangedAt,
-      ChangedBy
+      ChangedBy,
+      LocChangedAt
 }

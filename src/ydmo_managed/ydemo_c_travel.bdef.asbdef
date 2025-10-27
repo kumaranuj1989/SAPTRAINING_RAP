@@ -1,6 +1,7 @@
 projection;
 strict ( 2 );
-
+use draft;
+use side effects;
 define behavior for YDEMO_C_TRAVEL alias TravelP
 use etag
 {
@@ -11,4 +12,13 @@ use etag
   //you can use Alias and external for the same action as well
   use action cancel_travel as Cancel;
   use action issue_message external 'IssueMessage';
+
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Prepare;
+  use action Resume;
+
+  use action adjustDuration;
+  use action checkCustomer;
 }

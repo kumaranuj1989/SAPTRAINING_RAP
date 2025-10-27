@@ -32,6 +32,10 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys FOR Travel~validateEndDate.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Travel RESULT result.
+
+    METHODS determineduration FOR DETERMINE ON SAVE
+      IMPORTING keys FOR travel~determineduration.
+
     METHODS earlynumbering_create FOR NUMBERING
       IMPORTING entities FOR CREATE Travel.
 
@@ -126,6 +130,9 @@ CLASS lhc_Travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD validateCustomer.
+
+    CONSTANTS c_area TYPE string VALUE `CUST`.
+
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
     ENTITY Travel
     FIELDS ( CustomerId )
@@ -133,12 +140,16 @@ CLASS lhc_Travel IMPLEMENTATION.
     RESULT DATA(lt_result).
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      APPEND VALUE #( %tky = <lfs_result>-%tky
+                       %state_area = c_area  ) TO reported-travel.
+
       IF <lfs_result>-CustomerId IS INITIAL.
         APPEND VALUE #( %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #(  %tky = <lfs_result>-%tky
                          %msg = NEW ycl_demo_msg( ycl_demo_msg=>field_empty )
-                         %element-CustomerId = if_abap_behv=>mk-on ) TO reported-travel.
+                         %element-CustomerId = if_abap_behv=>mk-on
+                          %state_area = c_area ) TO reported-travel.
       ELSE.
         SELECT SINGLE FROM /dmo/i_customer FIELDS CustomerID WHERE CustomerID = @<lfs_result>-CustomerId INTO @DATA(dummy).
         IF sy-subrc IS NOT INITIAL.
@@ -146,13 +157,16 @@ CLASS lhc_Travel IMPLEMENTATION.
 
           APPEND VALUE #(  %tky = <lfs_result>-%tky
                          %msg = NEW ycl_demo_msg( ycl_demo_msg=>customer_not_exist )
-                         %element-CustomerId = if_abap_behv=>mk-on ) TO reported-travel.
+                         %element-CustomerId = if_abap_behv=>mk-on
+                          %state_area = c_area ) TO reported-travel.
         ENDIF.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD validateDescription.
+    CONSTANTS c_area TYPE string VALUE `DESC`.
+
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
     ENTITY Travel
     FIELDS ( Description )
@@ -160,18 +174,25 @@ CLASS lhc_Travel IMPLEMENTATION.
     RESULT DATA(lt_result).
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      APPEND VALUE #( %tky = <lfs_result>-%tky
+                     %state_area = c_area  ) TO reported-travel.
+
       IF <lfs_result>-Description IS INITIAL.
         APPEND VALUE #( %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                         %msg = NEW ycl_demo_msg( ycl_demo_msg=>field_empty )
-                        %element-Description = if_abap_behv=>mk-on ) TO reported-travel.
+                        %element-Description = if_abap_behv=>mk-on
+                        %state_area = c_area ) TO reported-travel.
       ENDIF.
     ENDLOOP.
 
   ENDMETHOD.
 
   METHOD validateBeginDate.
+
+    CONSTANTS c_area TYPE string VALUE `BEGINDATE`.
+
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
     ENTITY Travel
     FIELDS ( BeginDate )
@@ -179,23 +200,31 @@ CLASS lhc_Travel IMPLEMENTATION.
     RESULT DATA(lt_result).
 
     LOOP AT lt_Result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      APPEND VALUE #( %tky = <lfs_result>-%tky
+                       %state_area = c_area  ) TO reported-travel.
+
       IF <lfs_result>-BeginDate IS INITIAL.
         APPEND VALUE #(  %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                         %msg = NEW ycl_demo_msg( ycl_demo_msg=>field_empty )
-                        %element-BeginDate = if_abap_behv=>mk-on ) TO reported-travel.
+                        %element-BeginDate = if_abap_behv=>mk-on
+                        %state_area = c_area ) TO reported-travel.
       ELSEIF <lfs_result>-BeginDate LT cl_abap_context_info=>get_system_date( ).
         APPEND VALUE #(  %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                           %msg = NEW ycl_demo_msg( ycl_demo_msg=>begin_date_past )
-                          %element-BeginDate = if_abap_behv=>mk-on ) TO reported-travel.
+                          %element-BeginDate = if_abap_behv=>mk-on
+                          %state_area = c_area ) TO reported-travel.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD validateEndDate.
+
+    CONSTANTS c_area TYPE string VALUE `ENDDATE`.
+
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
       ENTITY Travel
       FIELDS ( EndDate )
@@ -203,23 +232,31 @@ CLASS lhc_Travel IMPLEMENTATION.
       RESULT DATA(lt_result).
 
     LOOP AT lt_Result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      APPEND VALUE #( %tky = <lfs_result>-%tky
+                       %state_area = c_area  ) TO reported-travel.
+
       IF <lfs_result>-EndDate IS INITIAL.
         APPEND VALUE #(  %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                         %msg = NEW ycl_demo_msg( ycl_demo_msg=>field_empty )
-                        %element-EndDate = if_abap_behv=>mk-on ) TO reported-travel.
+                        %element-EndDate = if_abap_behv=>mk-on
+                        %state_area = c_area ) TO reported-travel.
       ELSEIF <lfs_result>-EndDate LT cl_abap_context_info=>get_system_date( ).
         APPEND VALUE #(  %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                           %msg = NEW ycl_demo_msg( ycl_demo_msg=>end_date_past )
-                          %element-EndDate = if_abap_behv=>mk-on ) TO reported-travel.
+                          %element-EndDate = if_abap_behv=>mk-on
+                          %state_area = c_area ) TO reported-travel.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD validateDateSequence.
+
+    CONSTANTS c_area TYPE string VALUE `SEQUENCE`.
+
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
        ENTITY Travel
        FIELDS ( BeginDate EndDate )
@@ -227,13 +264,17 @@ CLASS lhc_Travel IMPLEMENTATION.
        RESULT DATA(lt_result).
 
     LOOP AT lt_Result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+      APPEND VALUE #( %tky = <lfs_result>-%tky
+                         %state_area = c_area  ) TO reported-travel.
+
       IF <lfs_result>-EndDate LT <lfs_result>-BeginDate.
         APPEND VALUE #(  %tky = <lfs_result>-%tky ) TO failed-travel.
 
         APPEND VALUE #( %tky = <lfs_result>-%tky
                           %msg = NEW ycl_demo_msg( ycl_demo_msg=>dates_wrong_sequence )
                           %element = VALUE #( BeginDate = if_abap_behv=>mk-on
-                                              EndDate   = if_abap_behv=>mk-on ) ) TO reported-travel.
+                                              EndDate   = if_abap_behv=>mk-on )
+                          %state_area = c_area ) TO reported-travel.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
@@ -253,13 +294,34 @@ CLASS lhc_Travel IMPLEMENTATION.
   METHOD get_instance_features.
     READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
        ENTITY Travel
-       FIELDS ( Status BeginDate EndDate )
+       FIELDS ( Status BeginDate EndDate ChangedBy )
        WITH CORRESPONDING #( keys )
        RESULT DATA(lt_travel).
 
     LOOP AT lt_travel ASSIGNING FIELD-SYMBOL(<lfs_travel>).
-    "In instance-based feature control, it is important that you add a row to result for each row of keys. If you fail to do so, it leads to a runtime error.
+      "In instance-based feature control, it is important that you add a row to result for each row of keys. If you fail to do so, it leads to a runtime error.
       APPEND CORRESPONDING #( <lfs_travel> ) TO result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+
+      IF <lfs_travel>-%is_draft = if_abap_behv=>mk-on. " Special Handling for Drafts
+        " Try to Read BeginDate and EndDate from active instance
+        READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
+        ENTITY Travel
+        FIELDS ( begindate enddate )
+        WITH VALUE #( ( %key      = <lfs_travel>-%key
+                        %is_draft = if_abap_behv=>mk-off ) )  "optional
+           RESULT DATA(travels_activ).
+        IF travels_activ IS NOT INITIAL.
+          " edit draft (active instance exists)
+          " use BeginDate and EndDate in active instance for feature control
+          <lfs_travel>-begindate = travels_activ[ 1 ]-begindate.
+          <lfs_travel>-enddate   = travels_activ[ 1 ]-enddate.
+        ELSE.
+          " new draft - use initial values for feature control.
+          CLEAR <lfs_travel>-begindate.
+          CLEAR <lfs_travel>-enddate.
+        ENDIF.
+
+      ENDIF.
 
       IF <lfs_travel>-Status = 'C' OR
          ( <lfs_travel>-EndDate IS NOT INITIAL AND <lfs_travel>-EndDate <  cl_abap_context_info=>get_system_date( ) ).
@@ -286,6 +348,25 @@ CLASS lhc_Travel IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
 
+  ENDMETHOD.
+
+  METHOD determineDuration.
+    READ ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
+         ENTITY Travel
+         FIELDS (  begindate enddate )
+         WITH CORRESPONDING #( keys )
+         RESULT DATA(travels).
+
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      <travel>-duration = <travel>-enddate - <travel>-begindate.
+    ENDLOOP.
+
+
+    MODIFY ENTITIES OF ydemo_R_TRAVEL IN LOCAL MODE
+       ENTITY travel
+         UPDATE
+         FIELDS ( duration )
+         WITH CORRESPONDING #( travels ).
   ENDMETHOD.
 
 ENDCLASS.

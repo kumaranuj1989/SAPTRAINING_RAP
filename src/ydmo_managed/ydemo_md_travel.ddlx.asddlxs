@@ -48,6 +48,11 @@ annotate entity YDEMO_C_TRAVEL with
          identification: [ { position: 60, importance: #LOW } ]
        }
   EndDate;
+  @UI: {
+           lineItem:       [ { position: 55, importance: #LOW } ],
+           identification: [ { position: 65, importance: #LOW } ]
+         }
+  Duration;
 
   @UI: { lineItem:       [ { position: 10, importance: #HIGH } ],
          identification: [ { position: 70, importance: #HIGH } ]
@@ -66,4 +71,7 @@ annotate entity YDEMO_C_TRAVEL with
   @UI: {identification: [ { position: 90, importance: #LOW } ]
       }
   ChangedBy;
+  @UI: {identification: [ { position: 100, importance: #LOW } ]
+      }
+  LocChangedAt;
 }
