@@ -1,0 +1,27 @@
+managed implementation in class zbp_dmo_r_travel unique;
+strict ( 2 );
+
+define behavior for YDMO_R_TRAVEL alias Travel
+persistent table ydmo_travel
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  field ( readonly ) AgencyId, TravelId;
+  association _TravelItem { create; }
+}
+
+define behavior for YDMO_R_TRAVELITEM alias TravelItem
+persistent table ydmo_travelitem
+lock dependent by _Travel
+authorization dependent by _Travel
+//etag master <field_name>
+{
+  update;
+  delete;
+  field ( readonly ) ItemUuid, AgencyId, TravelId;
+  association _Travel;
+}
