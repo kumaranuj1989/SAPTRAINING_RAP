@@ -1,27 +1,70 @@
 managed implementation in class zbp_dmo_r_travel unique;
 strict ( 2 );
 
+with draft;
+
 define behavior for YDMO_R_TRAVEL alias Travel
 persistent table ydmo_travel
-lock master
+draft table ydmo_d_travel
+lock master total etag ChangedAt
 authorization master ( instance )
-//etag master <field_name>
+etag master LocChangedAt  //ChangedAt
 {
   create ( authorization : global );
   update;
   delete;
-  field ( readonly ) AgencyId, TravelId;
-  association _TravelItem { create; }
+  field ( readonly : update ) AgencyId, TravelId;
+  association _TravelItem { create; with draft; }
+
+  field ( readonly ) ChangedAt, ChangedBy, LocChangedAt;
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ydmo_travel corresponding
+    {
+      AgencyID     = agency_ID;
+      TravelID     = travel_id;
+      CustomerID   = customer_id;
+      BeginDate    = begin_date;
+      EndDate      = end_date;
+      ChangedAt    = changed_at;
+      ChangedBy    = changed_by;
+      LocChangedAt = loc_changed_at;
+    }
 }
 
 define behavior for YDMO_R_TRAVELITEM alias TravelItem
 persistent table ydmo_travelitem
+draft table ydmo_dtravelitem
+
 lock dependent by _Travel
 authorization dependent by _Travel
-//etag master <field_name>
+etag master LocChangedAt
 {
   update;
   delete;
-  field ( readonly ) ItemUuid, AgencyId, TravelId;
-  association _Travel;
+  field ( readonly ) AgencyId, TravelId;
+  association _Travel { with draft; }
+
+  field ( readonly, numbering : managed ) ItemUuid;
+
+  mapping for ydmo_travelitem corresponding
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
+    }
 }

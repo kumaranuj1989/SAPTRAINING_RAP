@@ -1,0 +1,5 @@
+@EndUserText.label: 'Service Defination for Travel'
+define service YDMO_sd_TRAVEL {
+  expose YDMO_C_TRAVEL     as Travel;
+  expose YDMO_C_TRAVELITEM as item;
+}
