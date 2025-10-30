@@ -9,7 +9,8 @@
      }
 annotate entity YDMO_C_TRAVEL with
 {
-  @UI:{ facet: [{ purpose: #STANDARD,id: 'Travel',position: 10, label: 'Travel',type: #IDENTIFICATION_REFERENCE }],
+  @UI:{ facet: [{ purpose: #STANDARD,id: 'Travel',position: 10, label: 'Travel',type: #IDENTIFICATION_REFERENCE },
+                 { purpose: #STANDARD,id: 'Travelitem',position: 20, label: 'Travel Item',type: #LINEITEM_REFERENCE, targetElement: '_TravelItem' } ],
 
         identification: [{ label: 'Agency ID',position: 10, importance: #LOW }],
         lineItem: [{ position: 10, label: 'Agency ID', type: #STANDARD }]
