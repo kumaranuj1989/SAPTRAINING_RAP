@@ -18,6 +18,7 @@ use etag
 }
 
 define behavior for YDMO_C_TRAVELITEM alias TravelItemP
+use etag
 {
   use update;
   use delete;

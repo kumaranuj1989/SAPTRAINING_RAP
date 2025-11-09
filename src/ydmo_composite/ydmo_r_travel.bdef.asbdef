@@ -22,7 +22,10 @@ etag master LocChangedAt  //ChangedAt
   draft action Activate optimized;
   draft action Discard;
   draft action Resume;
-  draft determine action Prepare;
+  draft determine action Prepare
+  {
+  validation TravelItem~ValidateFlightDate;
+  }
 
   mapping for ydmo_travel corresponding
     {
@@ -51,6 +54,10 @@ etag master LocChangedAt
   association _Travel { with draft; }
 
   field ( readonly, numbering : managed ) ItemUuid;
+
+  validation validateFlightDate on save { create; field FlightDate; }
+
+   determination determineTravelDates on save { field FlightDate; }
 
   mapping for ydmo_travelitem corresponding
     {
