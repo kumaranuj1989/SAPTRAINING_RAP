@@ -1,5 +1,9 @@
 CLASS zbp_demo_r_travel DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF ydemo_r_travel.
+protected section.
+private section.
 ENDCLASS.
 
-CLASS zbp_demo_r_travel IMPLEMENTATION.
+
+
+CLASS ZBP_DEMO_R_TRAVEL IMPLEMENTATION.
 ENDCLASS.

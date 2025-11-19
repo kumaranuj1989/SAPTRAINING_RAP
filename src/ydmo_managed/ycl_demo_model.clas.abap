@@ -30,7 +30,9 @@ ENDCLASS.
 
 
 
-CLASS ycl_demo_model IMPLEMENTATION.
+CLASS YCL_DEMO_MODEL IMPLEMENTATION.
+
+
   METHOD authority_check.
 
 * This method simulates an authority check

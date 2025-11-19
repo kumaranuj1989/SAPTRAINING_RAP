@@ -15,7 +15,9 @@ ENDCLASS.
 
 
 
-CLASS ycl_demo_travel_fill IMPLEMENTATION.
+CLASS YCL_DEMO_TRAVEL_FILL IMPLEMENTATION.
+
+
   METHOD if_oo_adt_classrun~main.
     TRY.
         DATA(dbtable) = NEW lcl_dbtable( c_travel_table ).
@@ -36,5 +38,4 @@ CLASS ycl_demo_travel_fill IMPLEMENTATION.
         out->write( |{ c_travel_table } is not a table in software component ZLOCAL| ).
     ENDTRY.
   ENDMETHOD.
-
 ENDCLASS.

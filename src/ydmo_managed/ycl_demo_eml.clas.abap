@@ -17,7 +17,9 @@ ENDCLASS.
 
 
 
-CLASS ycl_demo_eml IMPLEMENTATION.
+CLASS YCL_DEMO_EML IMPLEMENTATION.
+
+
   METHOD if_oo_adt_classrun~main.
 
     READ ENTITIES OF ydemo_R_TRAVEL
